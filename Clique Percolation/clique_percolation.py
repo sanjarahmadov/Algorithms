@@ -51,7 +51,6 @@ def pivot(G, S):
 def k_clique(G, k, R, P, X, cliques, outermost):
 	global n
 	n += 1
-	print(n)
 	if len(P | X) == 0:
 		if len(R) >= k:
 			cliques.append(R[:])
@@ -73,6 +72,44 @@ def k_clique(G, k, R, P, X, cliques, outermost):
 
 	return cliques
 
+def find_communities(G):
+	nodes = list(G.keys())
+	s = []
+	s.append(nodes[0])
+	communities = []
+	temp = []
+	while len(s) > 0:
+		curr = s.pop(0)
+		if curr in nodes:
+			nodes.remove(curr)
+		temp.append(curr)
+		for i in G[curr]:
+			if i in nodes:
+				s.append(i)
+
+		if len(s) == 0 and len(nodes) > 0:
+			s.append(nodes[0])
+			communities.append(temp)
+			temp = []
+	if len(temp) > 0:
+		communities.append(temp)
+	return communities
+
+def cliques2graph(cliques, k):
+	C_G = dict()
+	for i in range(len(cliques)):
+		curr = set(cliques[i])
+		if i+1 not in C_G:
+			C_G[i+1] = []
+		for j in range(i+1, len(cliques)):
+			if len((curr & set(cliques[j]))) >= k-1:
+				C_G[i+1].append(j+1)
+
+				if j+1 in C_G:
+					C_G[j+1].append(i+1)
+				else:
+					C_G[j+1] = [i+1]	
+	return C_G
 
 def clique_percolation(G, k):
 	# Get cliqeus having more than k vertices
@@ -82,6 +119,22 @@ def clique_percolation(G, k):
 
 	cliques = k_clique(G, k, R, P, X, [], True)
 	
-	return cliques
+	# When there is no cliques there is no community
+	if not len(cliques) > 0:
+		return -1
 
-print(clique_percolation(GG, 2))
+	C_G = cliques2graph(cliques, k)				
+	communities = find_communities(C_G)
+
+	communities_detailed = dict()
+
+	for i in range(len(communities)):
+		temp = set()
+		curr_list = communities[i]
+		for j in curr_list:
+			temp = temp | set(cliques[j-1])
+		communities_detailed[i+1] = temp
+	
+	return communities_detailed
+
+print(clique_percolation(G, 3))
