@@ -1,3 +1,3 @@
 # Algorithms
 
-Here I have posted some of algorithms which I found interesting
+Here I have posted some of the algorithms which I found interesting
