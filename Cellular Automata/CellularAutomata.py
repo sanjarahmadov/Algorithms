@@ -12,6 +12,8 @@ class Rule30Class(object):
 		
 		:type a, b, c: Char
 		:param a, b, c: First, second and third nodes respectively
+	
+		:type return: Char
 		"""
 
 		if ((a == '1' and b == '1' and c == '1')
@@ -26,8 +28,10 @@ class Rule30Class(object):
 		"""
 		Iterate over new row from second to last - 1 th element, and generate next node accoding to Rule 30
 		
-		:type row: List[char]
+		:type row: List[Char]
 		:param row: List of nodes
+
+		:type return: List[Char]
 		"""
 
 		new_row = [None]*len(row)
@@ -60,6 +64,8 @@ class SixValuePattern(object):
 	def pprint(self):
 		"""
 		Pretty Print for a six value pattern
+		
+		:type return: String
 		"""
 		res = []
 		for i in range(len(self._pattern)):
@@ -87,6 +93,8 @@ def readCsv(filename):
 
 	:type filename: String
 	:param filename: Name of a file from which we will read the first row in current directory
+	
+	:type return: List[Char]
 	"""
 	res = []
 	with open(filename) as f:
@@ -108,6 +116,8 @@ def newRow(ruleGenerator, row, pattern_map):
 
 	:type pattern_map: Dict
 	:param pattern_map: Maps patterns to list of coordinates of the middle elements of second row in two row (six value) pattern
+
+	:type return: (List[Char], Dict)
 	"""
 	new_row = ruleGenerator.generateNextRow(row)
 	row_index = ruleGenerator.getCurrRow()
@@ -131,6 +141,8 @@ def get_pattern_occurrences(pattern_k, pattern_map):
 
 	:type pattern_map: Dict
 	:param pattern_map: Maps patterns to list of coordinates of the middle elements of second row in two row (six value) pattern
+
+	:type return: List[Tuple[Int]]
 	"""
 	if pattern_k in pattern_map:
 		return pattern_map[pattern_k]
@@ -139,6 +151,10 @@ def get_pattern_occurrences(pattern_k, pattern_map):
 
 def Main():
 	A = readCsv("first_row.csv")
+	if len(A[0]) < 3:
+		print("At least three elements has to be in first row")
+		return
+
 	instance_of_rule30 = Rule30Class()
 	pattern_map = dict()
 	
