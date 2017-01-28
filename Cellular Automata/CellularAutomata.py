@@ -3,9 +3,17 @@ class Rule30Class(object):
 	Applies Rule 30 Cellular automation
 	"""
 	def __init__(self, r = 0):
+		# We track the row index per instance in order to know the exact coordinates of matching six value pattern
 		self._rowIndex = r
 
 	def generateNextNode(self, a, b, c):
+		"""
+		Rule 30 logic is applied here
+		
+		:type a, b, c: Char
+		:param a, b, c: First, second and third nodes respectively
+		"""
+
 		if ((a == '1' and b == '1' and c == '1')
 		or  (a == '1' and b == '1' and c == '0')
 		or  (a == '1' and b == '0' and c == '1')
@@ -15,7 +23,13 @@ class Rule30Class(object):
 			return '1'
 	
 	def generateNextRow(self, row):
+		"""
+		Iterate over new row from second to last - 1 th element, and generate next node accoding to Rule 30
 		
+		:type row: List[char]
+		:param row: List of nodes
+		"""
+
 		new_row = [None]*len(row)
 		for i in range(1, len(row) - 1):
 			new_row[i] = self.generateNextNode(row[i-1], row[i], row[i+1])
@@ -29,15 +43,24 @@ class Rule30Class(object):
 		return self._rowIndex
 
 class SixValuePattern(object):
+	"""
+	Object representing 6 value pattern
+	"""
 	def __init__(self, pattern):
 		simplePattern = "".join("".join(pattern.split("/")).split("-"))
+		
+		# Allows only 6 valued patterns for this problem
 		assert (len(simplePattern) == 6), "Not a 6 value pattern"
+
 		self._pattern = simplePattern
 
 	def __str__(self):
 		return self._pattern
 	
 	def pprint(self):
+		"""
+		Pretty Print for a six value pattern
+		"""
 		res = []
 		for i in range(len(self._pattern)):
 			res.append(self._pattern[i])
@@ -48,6 +71,7 @@ class SixValuePattern(object):
 		res.pop()
 		return "".join(res)
 	
+	# We override operators so that we can use six valued patterns as dictionary keys
 	def __hash__(self):
 		return hash(self._pattern)
 	
@@ -58,6 +82,12 @@ class SixValuePattern(object):
 		return not self.__eq__(other)
 
 def readCsv(filename):
+	"""
+	Read .csv file and make sure that it only contains one row
+
+	:type filename: String
+	:param filename: Name of a file from which we will read the first row in current directory
+	"""
 	res = []
 	with open(filename) as f:
 		for line in f:
@@ -67,6 +97,18 @@ def readCsv(filename):
 	return res
 
 def newRow(ruleGenerator, row, pattern_map):
+	"""
+	Generate next row and update the pattern_map with occuring patterns
+
+	:type ruleGenerator: Rule30Class
+	:param ruleGenerator: Instance of a Rule30Class to generate nex row"
+
+	:type row: List[char]
+	:param row: List of nodes
+
+	:type pattern_map: Dict
+	:param pattern_map: Maps patterns to list of coordinates of the middle elements of second row in two row (six value) pattern
+	"""
 	new_row = ruleGenerator.generateNextRow(row)
 	row_index = ruleGenerator.getCurrRow()
 	start = 0
@@ -81,10 +123,19 @@ def newRow(ruleGenerator, row, pattern_map):
 	return new_row, pattern_map
 
 def get_pattern_occurrences(pattern_k, pattern_map):
+	"""
+	Returns list of coordinates for the pattern if it had occured in our result
+
+	:type pattern_k: SixValuePattern
+	:param pattern_k: Two row, six value pattern
+
+	:type pattern_map: Dict
+	:param pattern_map: Maps patterns to list of coordinates of the middle elements of second row in two row (six value) pattern
+	"""
 	if pattern_k in pattern_map:
 		return pattern_map[pattern_k]
 	else:
-		return "Such a pattern does not exist"
+		return "Such pattern does not exist"
 
 def Main():
 	A = readCsv("first_row.csv")
@@ -97,7 +148,7 @@ def Main():
 		next_row, pattern_map = newRow(instance_of_rule30, prev_row, pattern_map)
 		print("".join(next_row))
 		prev_row = next_row
-	print(len(pattern_map))	
+
 	patterns = [SixValuePattern("1-1-0/1-0-0"), SixValuePattern("1-1-0/1-0-1"), SixValuePattern("1-1-0/1-1-0")]
 	for pattern_k in patterns:
 		print(pattern_k.pprint())
